@@ -5,6 +5,7 @@ import android.net.Uri.parse
 import android.widget.MediaController
 import android.widget.VideoView
 import android.os.Bundle
+import android.os.PersistableBundle
 import com.google.android.material.snackbar.Snackbar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.activity.enableEdgeToEdge
@@ -26,36 +27,26 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        //specify the location of vide
-        val uri: Uri = parse(
-          "android.resource://"+  packageName + "/"
-            + "test"
+
+        //Find the VideoView class by its id
+        val videoView = findViewById<VideoView>(binding.testView.id)
+        //Creating MediaController
+        val mediaController = MediaController(this)
+        mediaController.setAnchorView(videoView)
+        //specify the location of media file
+        val uri:Uri = parse(
+            "android.resource://" + packageName
+                    + "/raw/test"
         )
-
-        ViewCompat.setOnApplyWindowInsetsListener(binding.main) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            insets
-        }
-        setSupportActionBar(binding.toolbar)
-
-        val navHostFragment =
-            supportFragmentManager.findFragmentById(R.id.nav_host_fragment_content_main) as NavHostFragment
-        val navController = navHostFragment.navController
-
-        appBarConfiguration = AppBarConfiguration(navController.graph)
-        setupActionBarWithNavController(navController, appBarConfiguration)
-
-        binding.fab.setOnClickListener { view ->
-            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                .setAction("Action", null)
-                .setAnchorView(R.id.fab).show()
-        }
+        //Setting MediaController and URI, then starting the videoView
+        videoView.setMediaController(mediaController)
+        videoView.setVideoURI(uri)
+        videoView.requestFocus()
+        videoView.start()
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
